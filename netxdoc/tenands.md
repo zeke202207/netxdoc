@@ -115,17 +115,17 @@ public class YourTenantStore : ITenantStore<Tenant>
 resolutionstrategy: 租户信息解析策略<br/>
 storestrategy： 租户信息存储策略<br/>
 tenants: 租户列表,```tenanttype```为多租户系统时生效<br/>
+password: 加密后的数据库连接密码,采用加密算法为``` DES ```
 
 使用方法
 ```
-    services.AddTenancy(config).Build();
+services.AddTenancy(config).Build();
 
-    ...
-    
-    app.UseMultiTenancy()
-    .UserTenancyDatabase();
+...
+
+app.UseMultiTenancy()
+.UserTenancyDatabase();
 ```
-
 
 ## <a name='-1'></a>数据库对多租户的支持
 
