@@ -1,4 +1,4 @@
-## 总览🧸 
+## <a name='s-0'></a>总览🧸 
 
 系统已经默认开启日志记录功能，日志会记录到当前租户的数据库中。日志配置如下
 
@@ -22,16 +22,16 @@ returnvaluethreshold : 返回值结果大于returnvaluethreshold设定的长度�
 jsonbehavior : 日志输出格式  0: 包装文本格式 1 : json格式
 
 
-## 系统日志
+## <a name='s-1'>系统日志
 
 [请参考日志管理模块实现](/netxdoc/modules/admintools/logging.md)
 
 
-## 审计日志
+## <a name='s-2'>审计日志
 
 [请参考日志管理模块实现](/netxdoc/modules/admintools/logging.md)
 
-## 支持自己扩展日志
+## <a name='s-3'>支持自己扩展日志
 
 ### 注入自己的日志写入类
 
