@@ -1,32 +1,23 @@
 ## <a name='s-3'></a>使用内置的Tenant、Strage、Store
 
 ```
- services.AddMutiTenancy(TenantType.Single)
-        //.WithTenancyDatabase(config)
-        .WithDatabaseInfo(new DatabaseInfo()
-        {
-            DatabaseHost = "127.0.0.1",
-            DatabaseName = "mytestdb",
-            DatabasePort = 3306,
-            DatabaseType = DatabaseType.MySql,
-            UserId = "root",
-            Password = "root"
-        })
-        .WithResolutionStrategy<HeaderResolutionStrategy>()
-        .WithStore<InMemoryTenantStore>()
-        .WithPerTenantOptions<CookiePolicyOptions>((options, tenant) =>
+ services.AddTenancy(config).Build();
+...
+ app.UseMultiTenancy();
+```
+> 获取当前请求的租户信息： ``` TenantContext.CurrentTenant.Principal ``` 
+
+> 模拟scope过程：
+```
+ _serviceProvider.MockTenantScope((scope, tenant) =>
             {
-                options.ConsentCookie.Name = tenant.Id + "-consent";
+                var jobtaskCommand = scope.ServiceProvider.GetService<ICommandBus>();
+                //1. 从数据库获取所有任务
+                IQueryBus jobtaskQuery = scope.ServiceProvider.GetRequiredService<IQueryBus>();
+                var jobs = jobtaskQuery.Send<JobTaskQueryAll, IEnumerable<JobTaskModel>>(new JobTaskQueryAll(string.Empty)).GetAwaiter().GetResult();
+                ....
             });
 ```
-> 使用Http请求Head解析策略，租户采用内存存储方式，***WithPerTenantOptions*** 测试代码，为每个租户提供特定的配置项
-
-> HeaderResolutionStrategy要求：Http请求Header必须包含：identifier 的key，其值为 租户唯一身份标识 <br/>
-InMemoryTenantStore要求：根目录的config文件夹必须有tenants.json，在json文件内部配置好所有租户信息
-
-> WithDatabaseInfo 配置组合数据库，支持自动migration（[数据库迁移Margration](#Margration)），多租户情况下，将自动生成 [租户id-数据库名] 形式的新数据库
-
-> 获取当前请求的租户信息： ``` TenantContext.CurrentTenant.Principal ``` 
 
 ###  <a name='-1'></a>扩展租户支持
 
@@ -87,7 +78,7 @@ public class YourTenantStore : ITenantStore<Tenant>
 ```
 {
   "databaseinfo": {
-    "databasehost": "www.liuping.org.cn",
+    "databasehost": "127.0.0.1",
     "databasename": "netx-zeke",
     "databaseport": "8306",
     "databasetype": "0",
@@ -95,13 +86,15 @@ public class YourTenantStore : ITenantStore<Tenant>
     "password": "l/y+KD4Pa5Gj8jjloR5WyQ=="
   },
   "tenantconfig": {
-    "tenanttype": 0,
-    "resolutionstrategy": "NetX.Tenants.HostResolutionStrategy",
+    "tenanttype": 0, //0:single,1:multi,
+    "resolutionstrategy": "NetX.Tenants.DomainsParse",
     "storestrategy": "NetX.Tenants.InMemoryTenantStore",
     "tenants": [
       {
+        // tenantid:要求唯一，多租户下生效，数据库命名格式： tenantid-databasename
         "tenantid": "1",
-        "identifier": "zeke"
+        //用于解析判定属于哪一个租户
+        "identifier": "localhost"
       },
       {
         "tenantid": "2",
@@ -117,15 +110,6 @@ storestrategy： 租户信息存储策略<br/>
 tenants: 租户列表,```tenanttype```为多租户系统时生效<br/>
 password: 加密后的数据库连接密码,采用加密算法为``` DES ```
 
-使用方法
-```
-services.AddTenancy(config).Build();
-
-...
-
-app.UseMultiTenancy()
-.UserTenancyDatabase();
-```
 
 ## <a name='-1'></a>数据库对多租户的支持
 
@@ -202,60 +186,13 @@ app.UseMultiTenancy()
         > [Migration(数字)] ：```数字```必须唯一，将按照 ```数字``` 从小到大的顺序执行 （建议使用日期+时间方式）<br/>
         > 初始化数据迁移类 ```[Migration(数字)]``` 标签 中的数字一定要大于其使用的表的建数字，用人类的预言表述，就是必须有表之后才能插入数据<br/>
 
-### <a name='-1'></a>注入数据库配置
-
-```
-ServerHost.Start(
-    RunOption.Default
-    .ConfigrationServiceCollection(services =>
-    {
-        services.AddScoped<IZeke, Zeke>();
-        //1.多租户设置
-        services.AddTenancy(TenantType.Multi)
-                .WithDatabaseInfo(new DatabaseInfo()
-                {
-                    DatabaseHost = "127.0.0.1",
-                    DatabaseName = "mytestdb",
-                    DatabasePort = 3306,
-                    DatabaseType = DatabaseType.MySql,
-                    UserId = "root",
-                    Password = "root"
-                })
-                .WithResolutionStrategy<HostResolutionStrategy>()
-                .WithStore<InMemoryTenantStore>()
-                .WithPerTenantOptions<CookiePolicyOptions>((options, tenant) =>
-                {
-                    options.ConsentCookie.Name = tenant.TenantId + "-consent";
-                })
-                .WithTenancyDatabase();
-    })
-    .ConfigApplication(app =>
-    {
-        //1.多租户
-        app.UseMultiTenancy()
-        .UserTenancyDatabase();
-    })
-    , "http://*:8220"
-    );
-```
-
-> WithDatabaseInfo： 添加数据库配置信息
-> WithTenancyDatabase: 配置租户数据库
-> UserTenancyDatabase: 使用租户数据库
-
-搞定，享受netx带来的喜悦吧！ :rocket:
-
 ### 如何获取租户注入信息
 
 ```
     public class Test2Controller : ApiPermissionController
     {
-        private readonly IFreeSql _fsql;
-
-        public Test2Controller(
-            IFreeSql fsql)
+        public Test2Controller()
         {
-            this._fsql = fsql;
         }
 
         /// <summary>
@@ -267,14 +204,11 @@ ServerHost.Start(
         [HttpGet]
         public ActionResult GetToken()
         {
-            //访问数据库
-            var result = _fsql.Queryable<Log1>().ToList();
             //租户信息
             var tenatninfo = TenantContext.CurrentTenant;
         } 
     }
 
 ```
-> 只需要注入 IFreeSql 便可方便的进行数据库访问
 > 通过 TenantContext 类，对租户信息进行了封装
 

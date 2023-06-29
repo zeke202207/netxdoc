@@ -6,11 +6,15 @@
 ![startmodule](images/startmodule.png)
 
     ServerHost为程序入口函数，通过使用调用Start方法即可启动程序
+    服务注入顺序 ： 系统组件 -> 启动参数配置组件 -> 用户自定义模块组件
+    服务注入顺序 ： 系统组件 -> 启动参数配置组件 -> 用户自定义模块组件
+    服务注入顺序 ： 系统组件 -> 启动参数配置组件 -> 用户自定义模块组件
 
 ## <a name='s-1'></a>简单无脑启动
   ```
     ServerHost.Start(RunOption.Default);
   ```
+   > 自定义监听地址：netx.json 配置监听节点："urls": "http://*:8221",
 
 ## <a name='s-2'></a>自定义注入启动
 ```
@@ -18,13 +22,13 @@ ServerHost.Start(
     RunOption.Default
     .ConfigrationServiceCollection(p => p.AddScoped<IZeke, Zeke>())
     .ConfigApplication(p=>p.UseAuthentication()
-    ..ConfigrationManager(p=>p.AddJsonFile(""))
+    .ConfigrationManager(p=>p.AddJsonFile(""))
     );
 ```
 
 ## <a name='s-3'></a>带指定url启动方式 
 ```
-    ServerHost.Start(RunOption.Default);
+    ServerHost.Start(RunOption.Default, "http://*:8220");
 ```
 
 ## <a name='s-4'></a>用户如何自定义模块
@@ -86,12 +90,13 @@ ServerHost.Start(
             "Version": "1.0.0.0",
             "Enabled": true,
             "FileName": "module1.dll",
-            "IsSharedAssemblyContext":true
+            "IsSharedAssemblyContext":true,
+            "Description":"模块描述信息"
         }
 
     ```
 
-    > id: 唯一标识，与 ``` ModuleInitializer.cs ``` 保持一致 <br/>
+    > id: 唯一标识，与 ``` ModuleInitializer.cs ``` 中的 ```Key``` 保持一致 <br/>
     > Name: 模块的名称 <br/>
     > Version: 模块的版本 <br/>
     > Enabled: 是否启功该模块 <br/>
@@ -99,3 +104,4 @@ ServerHost.Start(
     > IsSharedAssemblyContext: 是否为共享AssemblyContext <br/>
     -----> true : 与NetX共用程序集 <br/>
     -----> false: 独立程序集
+
