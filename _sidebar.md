@@ -10,6 +10,7 @@
 * [事件总线](/netxdoc/eventbus.md)
 * [多租户支持](/netxdoc/tenands.md)
 * [规范化接口文档](/netxdoc/apidoc.md)
+* [管道模式支持](/netxdoc/pipeline.md)
 
 <br/>
 
