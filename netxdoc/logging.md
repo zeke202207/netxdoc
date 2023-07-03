@@ -7,8 +7,8 @@
 
 ## <a name='s-2'></a>审计日志
 
-[审计日志实现](/netxdoc/modules/loggers/auditlogging.md)
+[审计日志实现](/netxdoc/modules/loggers/auditlog.md)
 
 ## <a name='s-3'></a>统计日志
 
-[统计日志实现](/netxdoc/modules/loggers/statisticallogging.md)
+[统计日志实现](/netxdoc/modules/loggers/statisticallog.md)
