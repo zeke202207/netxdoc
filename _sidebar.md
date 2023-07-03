@@ -11,6 +11,7 @@
 * [多租户支持](/netxdoc/tenands.md)
 * [规范化接口文档](/netxdoc/apidoc.md)
 * [管道模式支持](/netxdoc/pipeline.md)
+* [消息队列](/netxdoc/messagequeue.md)
 
 <br/>
 
