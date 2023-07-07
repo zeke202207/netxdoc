@@ -10,7 +10,7 @@
 
 ## 目录结构
 
-![Alt text](../../images/image.png)
+![Alt text](../../images/rbac.png)
 
 > Controller: api对外开放接口 <br />
 Domain：核心领域
