@@ -138,3 +138,30 @@ Model：Dto对象
 Query 数据库访问使用的是 ```Dapper```
 
 
+## 第三方系统登录对接
+
+ - 接入流程 （gitee为例）
+  
+    1. 前台通过调用api接口```/api/account/getoauthurl```获取登录地址
+    2. 调用接口```/api/account/giteelogincallback```进行授权确认
+    3. 以下功能暂未实现，如果需要对接，请自行实现
+        > 根据三方系统获取的用户信息，查询是否已关联到netx用户<br />
+        已关联 -> 数据库获取用户信息，生成token，前台登录成功，跳转到系统主页面 <br />
+        未关联 -> 前台跳转到关联账号页面，关联成功后，生成token，跳转到系统主页面
+
+ - 其他三方系统支持
+    
+    1. 参考gitee实现即可
+        ```
+        public class YourOAuth : DefaultOAuthLogin<GiteeUserModel>
+        {
+            public YourOAuth(OAuthConfig oAuthConfig) : base(oAuthConfig)
+            {
+            }
+
+            protected override string AuthorizeUrl => "https://gitee.com/oauth/authorize";
+            protected override string AccessTokenUrl => "https://gitee.com/oauth/token";
+            protected override string UserInfoUrl => "https://gitee.com/api/v5/user";
+        }
+        ```
+so easy! :rocket::rocket::rocket:
