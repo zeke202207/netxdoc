@@ -143,11 +143,16 @@ Query 数据库访问使用的是 ```Dapper```
  - 接入流程 （gitee为例）
   
     1. 前台通过调用api接口```/api/account/getoauthurl```获取登录地址
-    2. 调用接口```/api/account/giteelogincallback```进行授权确认
+    2. 调用接口```/api/account/oauthlogin```进行登录
     3. 以下功能暂未实现，如果需要对接，请自行实现
-        > 根据三方系统获取的用户信息，查询是否已关联到netx用户<br />
-        已关联 -> 数据库获取用户信息，生成token，前台登录成功，跳转到系统主页面 <br />
-        未关联 -> 前台跳转到关联账号页面，关联成功后，生成token，跳转到系统主页面
+        > 三方系统用户唯一标识关联到netx用户 <font color='red'>未处理</font><br />
+        已关联 -> 数据库获取用户信息，生成token，前台登录成功，跳转到系统主页面 <font color='red'>已完成</font><br />
+        未关联 -> 前台跳转到关联账号页面，关联成功后，生成token，跳转到系统主页面<font color='red'>未处理</font>
+    
+    <font color='red'>请在如下地方修改</font>
+    ![Alt text](../../images/back.png)
+
+    ![Alt text](../../images/font.png)
 
  - 其他三方系统支持
     
