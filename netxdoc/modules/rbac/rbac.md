@@ -150,9 +150,9 @@ Query 数据库访问使用的是 ```Dapper```
         未关联 -> 前台跳转到关联账号页面，关联成功后，生成token，跳转到系统主页面<font color='red'>未处理</font>
     
     <font color='red'>请在如下地方修改</font>
-    ![Alt text](../../images/back.png)
+    ![Alt text](../../images/gitee-api.png)
 
-    ![Alt text](../../images/font.png)
+    ![Alt text](../../images/git-vue.png)
 
  - 其他三方系统支持
     
