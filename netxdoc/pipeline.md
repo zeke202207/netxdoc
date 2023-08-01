@@ -14,7 +14,7 @@ PipelineDataflow：支持仅输入无输出的管道数据处理<br />
     //注入代码
     public override void ConfigureServices(IServiceCollection services, IWebHostEnvironment env, ModuleContext context)
     {
-        services.AddChain<DataflowParameterA, DataflowResultA>(typeof(ChainMiddlewareA), typeof(ChainMiddlewareB), typeof(ChainMiddlewareC));
+        services.AddChain<DataflowParameterA, DataflowResultA>(ServiceLifetime.Transient,typeof(ChainMiddlewareA), typeof(ChainMiddlewareB), typeof(ChainMiddlewareC));
     }
 
     //使用方式    
@@ -45,7 +45,7 @@ ChainMiddlewareA、ChainMiddlewareB、ChainMiddlewareC 管道中间件（既管�
     var result = chain.Execute(new DataflowParameterA() { Id = "zeke" });
 ```
 
-## Chain管道模式（待返回值）
+## Chain管道模式（有返回值）
 
 使用如下方法
 - AddChain
@@ -63,8 +63,8 @@ services.AddChainAync<ParameterX, ResultX>(...)
 - AddPipelineAsync
 
 ```
-services.AddPipeline<ParameterX, ResultX>(...)
-services.AddPipelineAync<ParameterX, ResultX>(...)
+services.AddPipeline<ParameterX>(...)
+services.AddPipelineAync<ParameterX>(...)
 ```
 
 ## 管道阀门执行顺序设定
